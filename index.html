@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aircraft Performance Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <style>
-   body::before {
-  content: "";
-  position: fixed; 
-  top: 0;
-  left: 0;
-  width: 100vw;    
-  height: 100vh;   
-  backdrop-filter: blur(8px);
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 0;
-  pointer-events: none;
-}
+    body {
+      margin: 0;
+      padding: 24px 12px;
+      font-family: 'Segoe UI', sans-serif;
+      position: relative;
+      background-image: url('hi.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: scroll;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     body::before {
       content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       backdrop-filter: blur(8px);
       background-color: rgba(0, 0, 0, 0.4);
       z-index: 0;
+      pointer-events: none;
     }
     .card {
       position: relative;
@@ -38,6 +46,7 @@
       max-width: 700px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       color: white;
+      margin: 32px 0;
     }
     select, input {
       background: #1c3b57;
@@ -84,201 +93,208 @@
     .caution { color: #f1c40f; }
     .risk { color: #e74c3c; }
     canvas { margin-top: 28px; }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 16px;
+        max-width: 95%;
+      }
+    }
   </style>
 </head>
 <body>
-<div class="card">
-  <label for="preset">Aircraft Preset:</label>
-  <select id="preset">
-    <option value="">-- Choose Aircraft --</option>
-    <option value="Cessna 172">Cessna 172</option>
-    <option value="Piper PA-28">Piper PA-28</option>
-    <option value="Boeing 787 Dreamliner">Boeing 787 Dreamliner</option>
-    <option value="NAL Hansa">NAL Hansa</option>
-    <option value="Saras PT1">Saras PT1</option>
-    <option value="SARAS Mk II">SARAS Mk II</option>
-  </select>
-  <div style="margin: 10px 0; font-size: 0.9rem; color: #f1c40f;">
-    ⚠️ Values are estimated defaults. Adjust for your aircraft.
+  <div class="card">
+    <label for="preset">Aircraft Preset:</label>
+    <select id="preset">
+      <option value="">-- Choose Aircraft --</option>
+      <option value="Cessna 172">Cessna 172</option>
+      <option value="Piper PA-28">Piper PA-28</option>
+      <option value="Boeing 787 Dreamliner">Boeing 787 Dreamliner</option>
+      <option value="NAL Hansa">NAL Hansa</option>
+      <option value="Saras PT1">Saras PT1</option>
+      <option value="SARAS Mk II">SARAS Mk II</option>
+    </select>
+    <div style="margin: 10px 0; font-size: 0.9rem; color: #f1c40f;">
+   
+    </div>
+
+    <div class="row">
+      <div class="col"><label for="elev">Field Elevation (ft)</label><input type="number" id="elev"></div>
+      <div class="col"><label for="qnh">QNH (inHg)</label><input type="number" id="qnh"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label for="oat">OAT (°C)</label><input type="number" id="oat"></div>
+      <div class="col"><label for="mass">Aircraft Mass (kg)</label><input type="number" id="mass"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label for="wingArea">Wing Area (m²)</label><input type="number" id="wingArea"></div>
+      <div class="col"><label for="cl">Lift Coefficient (Cl)</label><input type="number" id="cl" step="0.01"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label for="cd">Drag Coefficient (Cd)</label><input type="number" id="cd" step="0.01"></div>
+      <div class="col"><label for="takeoffSpeed">Takeoff Speed (m/s)</label><input type="number" id="takeoffSpeed"></div>
+    </div>
+    <label for="powerAvailable">Power Available (W)</label>
+    <input type="number" id="powerAvailable">
+
+    <div style="display: flex; justify-content: center; gap: 16px;">
+      <button id="calcBtn">Calculate</button>
+      <button id="pdfBtn">Export PDF</button>
+      <button id="voiceBtn">🎙️ Ask AI</button>
+    </div>
+
+    <p id="result"></p>
+    <canvas id="chart" height="260"></canvas>
   </div>
 
-  <div class="row">
-    <div class="col"><label for="elev">Field Elevation (ft)</label><input type="number" id="elev"></div>
-    <div class="col"><label for="qnh">QNH (inHg)</label><input type="number" id="qnh"></div>
-  </div>
-  <div class="row">
-    <div class="col"><label for="oat">OAT (°C)</label><input type="number" id="oat"></div>
-    <div class="col"><label for="mass">Aircraft Mass (kg)</label><input type="number" id="mass"></div>
-  </div>
-  <div class="row">
-    <div class="col"><label for="wingArea">Wing Area (m²)</label><input type="number" id="wingArea"></div>
-    <div class="col"><label for="cl">Lift Coefficient (Cl)</label><input type="number" id="cl" step="0.01"></div>
-  </div>
-  <div class="row">
-    <div class="col"><label for="cd">Drag Coefficient (Cd)</label><input type="number" id="cd" step="0.01"></div>
-    <div class="col"><label for="takeoffSpeed">Takeoff Speed (m/s)</label><input type="number" id="takeoffSpeed"></div>
-  </div>
-  <label for="powerAvailable">Power Available (W)</label>
-  <input type="number" id="powerAvailable">
+  <script type="module">
+    const $ = id => document.getElementById(id);
+    const el = {
+      elev: $('elev'), qnh: $('qnh'), oat: $('oat'),
+      mass: $('mass'), wingArea: $('wingArea'), cl: $('cl'), cd: $('cd'),
+      takeoffSpeed: $('takeoffSpeed'), powerAvailable: $('powerAvailable'),
+      res: $('result'), chart: $('chart'), preset: $('preset'), voiceBtn: $('voiceBtn')
+    };
 
-  <div style="display: flex; justify-content: center; gap: 16px;">
-    <button id="calcBtn">Calculate</button>
-    <button id="pdfBtn">Export PDF</button>
-    <button id="voiceBtn">🎙️ Ask AI</button>
-  </div>
+    const aircraftData = {
+      "Cessna 172": { wingArea: 16.2, cl: 1.5, cd: 0.032, takeoffSpeed: 28.3, power: 119312 },
+      "Piper PA-28": { wingArea: 15.8, cl: 1.4, cd: 0.034, takeoffSpeed: 26.0, power: 112000 },
+      "Boeing 787 Dreamliner": { wingArea: 325, cl: 1.7, cd: 0.027, takeoffSpeed: 85, power: 13300000 },
+      "NAL Hansa": { wingArea: 10.6, cl: 1.2, cd: 0.03, takeoffSpeed: 28, power: 80000 },
+      "Saras PT1": { wingArea: 28.0, cl: 1.5, cd: 0.036, takeoffSpeed: 70, power: 2000000 },
+      "SARAS Mk II": { wingArea: 29.5, cl: 1.5, cd: 0.036, takeoffSpeed: 72, power: 2500000 }
+    };
 
-  <p id="result"></p>
-  <canvas id="chart" height="260"></canvas>
-</div>
-
-<script type="module">
-  const $ = id => document.getElementById(id);
-  const el = {
-    elev: $('elev'), qnh: $('qnh'), oat: $('oat'),
-    mass: $('mass'), wingArea: $('wingArea'), cl: $('cl'), cd: $('cd'),
-    takeoffSpeed: $('takeoffSpeed'), powerAvailable: $('powerAvailable'),
-    res: $('result'), chart: $('chart'), preset: $('preset'), voiceBtn: $('voiceBtn')
-  };
-
-  const aircraftData = {
-    "Cessna 172": { wingArea: 16.2, cl: 1.5, cd: 0.032, takeoffSpeed: 28.3, power: 119312 },
-    "Piper PA-28": { wingArea: 15.8, cl: 1.4, cd: 0.034, takeoffSpeed: 26.0, power: 112000 },
-    "Boeing 787 Dreamliner": { wingArea: 325, cl: 1.7, cd: 0.027, takeoffSpeed: 85, power: 13300000 },
-    "NAL Hansa": { wingArea: 10.6, cl: 1.2, cd: 0.03, takeoffSpeed: 28, power: 80000 },
-    "Saras PT1": { wingArea: 28.0, cl: 1.5, cd: 0.036, takeoffSpeed: 70, power: 2000000 },
-    "SARAS Mk II": { wingArea: 29.5, cl: 1.5, cd: 0.036, takeoffSpeed: 72, power: 2500000 }
-  };
-
-  el.preset.addEventListener('change', () => {
-    const model = el.preset.value;
-    if (!aircraftData[model]) return;
-    const data = aircraftData[model];
-    el.wingArea.value = data.wingArea;
-    el.cl.value = data.cl;
-    el.cd.value = data.cd;
-    el.takeoffSpeed.value = data.takeoffSpeed;
-    el.powerAvailable.value = data.power;
-  });
-
-  const TH = { SAFE: 5000, CAUTION: 8000 };
-  const LABELS = ["Pressure Alt", "ISA Temp", "Density Alt", "Lift", "Drag", "Climb Rate"];
-  let chart;
-
-  function initChart() {
-    chart = new Chart(el.chart.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: LABELS,
-        datasets: [{ label: "Values", data: [0, 0, 0, 0, 0, 0], backgroundColor: "#2ecc71" }]
-      },
-      options: { responsive: true, animation: false }
+    el.preset.addEventListener('change', () => {
+      const model = el.preset.value;
+      if (!aircraftData[model]) return;
+      const data = aircraftData[model];
+      el.wingArea.value = data.wingArea;
+      el.cl.value = data.cl;
+      el.cd.value = data.cd;
+      el.takeoffSpeed.value = data.takeoffSpeed;
+      el.powerAvailable.value = data.power;
     });
-  }
 
-  function calc() {
-    const elev = +el.elev.value,
-      qnh = +el.qnh.value,
-      oat = +el.oat.value,
-      mass = +el.mass.value,
-      area = +el.wingArea.value,
-      Cl = +el.cl.value,
-      Cd = +el.cd.value,
-      v = +el.takeoffSpeed.value,
-      pAvail = +el.powerAvailable.value;
+    const TH = { SAFE: 5000, CAUTION: 8000 };
+    const LABELS = ["Pressure Alt", "ISA Temp", "Density Alt", "Lift", "Drag", "Climb Rate"];
+    let chart;
 
-    if ([elev, qnh, oat, mass, area, Cl, Cd, v, pAvail].some(Number.isNaN)) return;
-
-    const pAlt = elev + 1000 * (29.92 - qnh);
-    const isaT = 15 - 2 * pAlt / 1000;
-    const dAlt = pAlt + 120 * (oat - isaT);
-
-    const tempK = oat + 273.15;
-    const pressure = 101325 * Math.pow(1 - (0.0065 * elev) / 288.15, 5.2561);
-    const rho = pressure / (287.05 * tempK);
-
-    const L = 0.5 * rho * v * v * area * Cl;
-    const D = 0.5 * rho * v * v * area * Cd;
-    const pReq = D * v;
-    const climbRate = (pAvail - pReq) / (mass * 9.81);
-
-    let cls, text;
-    if (dAlt < TH.SAFE) { cls = 'safe'; text = '✅ Take-off Possible (Safe)'; }
-    else if (dAlt < TH.CAUTION) { cls = 'caution'; text = '⚠️ Caution: Longer Roll'; }
-    else { cls = 'risk'; text = '❌ High Risk: Reduced Performance'; }
-
-    el.res.className = cls;
-    el.res.textContent = text;
-
-    const col = dAlt > TH.CAUTION ? '#e74c3c' : dAlt > TH.SAFE ? '#f1c40f' : '#2ecc71';
-    const ds = chart.data.datasets[0];
-    ds.data = [pAlt, isaT, dAlt, L, D, climbRate];
-    ds.backgroundColor = col;
-    chart.update();
-  }
-
-  $('calcBtn').addEventListener('click', calc);
-
-  $('pdfBtn').addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(14);
-    doc.text("Pre-Takeoff Performance Report", 105, 15, { align: "center" });
-    doc.setFontSize(11);
-    let y = 30;
-    LABELS.forEach((label, i) => {
-      const val = chart.data.datasets[0].data[i];
-      doc.text(`${label}: ${val.toFixed(2)}`, 20, y);
-      y += 7;
-    });
-    const img = el.chart.toDataURL("image/png");
-    doc.addImage(img, "PNG", 20, y + 10, 170, 80);
-    doc.save("PreTakeoffReport.pdf");
-  });
-
-  // === Voice Assistant ===
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.lang = 'en-US';
-
-  const synth = window.speechSynthesis;
-
-  function speak(text) {
-    const utter = new SpeechSynthesisUtterance(text);
-    synth.speak(utter);
-  }
-
-  el.voiceBtn.addEventListener('click', () => {
-    recognition.start();
-    speak("Voice assistant activated. Ask about density altitude, takeoff roll, or climb rate.");
-  });
-
-  recognition.onresult = function(event) {
-    const transcript = event.results[0][0].transcript.toLowerCase();
-    handleVoiceCommand(transcript);
-  };
-
-  function handleVoiceCommand(command) {
-    if (command.includes("density altitude")) {
-      const dAlt = chart.data.datasets[0].data[2];
-      speak(`The density altitude is ${dAlt.toFixed(0)} feet.`);
-    } else if (command.includes("takeoff roll")) {
-      const drag = chart.data.datasets[0].data[4];
-      const speed = +el.takeoffSpeed.value;
-      const mass = +el.mass.value;
-      const acceleration = (el.powerAvailable.value / (mass * speed));
-      const distance = (speed * speed) / (2 * acceleration);
-      speak(`Estimated takeoff roll is about ${distance.toFixed(0)} meters.`);
-    } else if (command.includes("climb rate")) {
-      const rate = chart.data.datasets[0].data[5];
-      speak(`Climb rate is approximately ${rate.toFixed(2)} meters per second.`);
-    } else {
-      speak("Command not recognized. Try asking about density altitude, takeoff roll, or climb rate.");
+    function initChart() {
+      chart = new Chart(el.chart.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: LABELS,
+          datasets: [{ label: "Values", data: [0, 0, 0, 0, 0, 0], backgroundColor: "#2ecc71" }]
+        },
+        options: { responsive: true, animation: false }
+      });
     }
-  }
 
-  initChart();
-</script>
+    function calc() {
+      const elev = +el.elev.value,
+        qnh = +el.qnh.value,
+        oat = +el.oat.value,
+        mass = +el.mass.value,
+        area = +el.wingArea.value,
+        Cl = +el.cl.value,
+        Cd = +el.cd.value,
+        v = +el.takeoffSpeed.value,
+        pAvail = +el.powerAvailable.value;
+
+      if ([elev, qnh, oat, mass, area, Cl, Cd, v, pAvail].some(Number.isNaN)) return;
+
+      const pAlt = elev + 1000 * (29.92 - qnh);
+      const isaT = 15 - 2 * pAlt / 1000;
+      const dAlt = pAlt + 120 * (oat - isaT);
+
+      const tempK = oat + 273.15;
+      const pressure = 101325 * Math.pow(1 - (0.0065 * elev) / 288.15, 5.2561);
+      const rho = pressure / (287.05 * tempK);
+
+      const L = 0.5 * rho * v * v * area * Cl;
+      const D = 0.5 * rho * v * v * area * Cd;
+      const pReq = D * v;
+      const climbRate = (pAvail - pReq) / (mass * 9.81);
+
+      let cls, text;
+      if (dAlt < TH.SAFE) { cls = 'safe'; text = '✅ Take-off Possible (Safe)'; }
+      else if (dAlt < TH.CAUTION) { cls = 'caution'; text = '⚠️ Caution: Longer Roll'; }
+      else { cls = 'risk'; text = '❌ High Risk: Reduced Performance'; }
+
+      el.res.className = cls;
+      el.res.textContent = text;
+
+      const col = dAlt > TH.CAUTION ? '#e74c3c' : dAlt > TH.SAFE ? '#f1c40f' : '#2ecc71';
+      const ds = chart.data.datasets[0];
+      ds.data = [pAlt, isaT, dAlt, L, D, climbRate];
+      ds.backgroundColor = col;
+      chart.update();
+    }
+
+    $('calcBtn').addEventListener('click', calc);
+
+    $('pdfBtn').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Pre-Takeoff Performance Report", 105, 15, { align: "center" });
+      doc.setFontSize(11);
+      let y = 30;
+      LABELS.forEach((label, i) => {
+        const val = chart.data.datasets[0].data[i];
+        doc.text(`${label}: ${val.toFixed(2)}`, 20, y);
+        y += 7;
+      });
+      const img = el.chart.toDataURL("image/png");
+      doc.addImage(img, "PNG", 20, y + 10, 170, 80);
+      doc.save("PreTakeoffReport.pdf");
+    });
+
+    // Voice assistant
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    const synth = window.speechSynthesis;
+
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      synth.speak(utter);
+    }
+
+    el.voiceBtn.addEventListener('click', () => {
+      recognition.start();
+      speak("Voice assistant activated. Ask about density altitude, takeoff roll, or climb rate.");
+    });
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      handleVoiceCommand(transcript);
+    };
+
+    function handleVoiceCommand(command) {
+      if (command.includes("density altitude")) {
+        const dAlt = chart.data.datasets[0].data[2];
+        speak(`The density altitude is ${dAlt.toFixed(0)} feet.`);
+      } else if (command.includes("takeoff roll")) {
+        const drag = chart.data.datasets[0].data[4];
+        const speed = +el.takeoffSpeed.value;
+        const mass = +el.mass.value;
+        const acceleration = (el.powerAvailable.value / (mass * speed));
+        const distance = (speed * speed) / (2 * acceleration);
+        speak(`Estimated takeoff roll is about ${distance.toFixed(0)} meters.`);
+      } else if (command.includes("climb rate")) {
+        const rate = chart.data.datasets[0].data[5];
+        speak(`Climb rate is approximately ${rate.toFixed(2)} meters per second.`);
+      } else {
+        speak("Command not recognized. Try asking about density altitude, takeoff roll, or climb rate.");
+      }
+    }
+
+    initChart();
+  </script>
 </body>
 </html>
