@@ -7,30 +7,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <style>
-    body {
+    html, body {
       margin: 0;
-      padding: 24px 12px;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
+      height: auto;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    body {
       position: relative;
       background-image: url('hi.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
       background-attachment: scroll;
-      min-height: 100vh;
-      overflow-x: hidden;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 24px 12px;
     }
     body::before {
       content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
       backdrop-filter: blur(8px);
       background-color: rgba(0, 0, 0, 0.4);
       z-index: 0;
@@ -94,30 +96,25 @@
     .risk { color: #e74c3c; }
     canvas { margin-top: 28px; }
 
+    .footer {
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 0.9rem;
+      padding: 16px 0;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1;
+      position: relative;
+    }
+
     @media (max-width: 600px) {
       .card {
         padding: 16px;
         max-width: 95%;
       }
     }
-    html, body {
-  height: auto;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-    .footer {
-  width: 100%;
-  text-align: center;
-  color: #ccc;
-  font-size: 0.9rem;
-  padding: 16px 0;
-  position: relative;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(4px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
   </style>
 </head>
 <body>
@@ -132,9 +129,6 @@
       <option value="Saras PT1">Saras PT1</option>
       <option value="SARAS Mk II">SARAS Mk II</option>
     </select>
-    <div style="margin: 10px 0; font-size: 0.9rem; color: #f1c40f;">
-   
-    </div>
 
     <div class="row">
       <div class="col"><label for="elev">Field Elevation (ft)</label><input type="number" id="elev"></div>
@@ -164,6 +158,10 @@
     <p id="result"></p>
     <canvas id="chart" height="260"></canvas>
   </div>
+
+  <footer class="footer">
+    © 2025 Aircraft Performance Calculator | Designed by Sahil
+  </footer>
 
   <script type="module">
     const $ = id => document.getElementById(id);
@@ -211,14 +209,14 @@
 
     function calc() {
       const elev = +el.elev.value,
-        qnh = +el.qnh.value,
-        oat = +el.oat.value,
-        mass = +el.mass.value,
-        area = +el.wingArea.value,
-        Cl = +el.cl.value,
-        Cd = +el.cd.value,
-        v = +el.takeoffSpeed.value,
-        pAvail = +el.powerAvailable.value;
+            qnh = +el.qnh.value,
+            oat = +el.oat.value,
+            mass = +el.mass.value,
+            area = +el.wingArea.value,
+            Cl = +el.cl.value,
+            Cd = +el.cd.value,
+            v = +el.takeoffSpeed.value,
+            pAvail = +el.powerAvailable.value;
 
       if ([elev, qnh, oat, mass, area, Cl, Cd, v, pAvail].some(Number.isNaN)) return;
 
@@ -269,13 +267,11 @@
       doc.save("PreTakeoffReport.pdf");
     });
 
-    // Voice assistant
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = 'en-US';
-
     const synth = window.speechSynthesis;
 
     function speak(text) {
@@ -298,22 +294,18 @@
         const dAlt = chart.data.datasets[0].data[2];
         speak(`The density altitude is ${dAlt.toFixed(0)} feet.`);
       } else if (command.includes("takeoff roll")) {
-        const drag = chart.data.datasets[0].data[4];
         const speed = +el.takeoffSpeed.value;
         const mass = +el.mass.value;
-        const acceleration = (el.powerAvailable.value / (mass * speed));
-        const distance = (speed * speed) / (2 * acceleration);
+        const acc = +el.powerAvailable.value / (mass * speed);
+        const distance = (speed * speed) / (2 * acc);
         speak(`Estimated takeoff roll is about ${distance.toFixed(0)} meters.`);
       } else if (command.includes("climb rate")) {
         const rate = chart.data.datasets[0].data[5];
         speak(`Climb rate is approximately ${rate.toFixed(2)} meters per second.`);
       } else {
-        speak("Command not recognized. Try asking about density altitude, takeoff roll, or climb rate.");
+        speak("Command not recognized.");
       }
     }
-    <footer class="footer">
-  © 2025 Aircraft Performance Calculator | Designed by Sahil
-</footer>
 
     initChart();
   </script>
