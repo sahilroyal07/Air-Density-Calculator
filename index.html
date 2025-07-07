@@ -7,19 +7,17 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <style>
-   body {
-  margin: 0;
-  padding: 24px 12px;
-  font-family: 'Segoe UI', sans-serif;
-  position: relative;
-  background-image: url('hi.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-attachment: scroll;
-  min-height: 100vh;
-  overflow-y: auto;
-  display: block;
+   body::before {
+  content: "";
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100vw;    
+  height: 100vh;   
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+  pointer-events: none;
 }
     body::before {
       content: "";
