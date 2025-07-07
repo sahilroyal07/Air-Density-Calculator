@@ -106,6 +106,18 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
+    .footer {
+  width: 100%;
+  text-align: center;
+  color: #ccc;
+  font-size: 0.9rem;
+  padding: 16px 0;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(4px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
   </style>
 </head>
 <body>
@@ -299,6 +311,9 @@
         speak("Command not recognized. Try asking about density altitude, takeoff roll, or climb rate.");
       }
     }
+    <footer class="footer">
+  © 2025 Aircraft Performance Calculator | Designed by Sahil
+</footer>
 
     initChart();
   </script>
