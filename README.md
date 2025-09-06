@@ -15,8 +15,7 @@ A professional web application designed for pilots, flight planners, and aviatio
   - Climb Rate  
 - 🌬️ **Wind Correction** for precise takeoff and climb calculations.  
 - 🔄 **Unit Conversion** (Metric ↔ Imperial).  
-- 📊 **Aircraft Performance Graphs** for comparing multiple aircraft.  
-- 🎛️ **Dual Round Gauges Dashboard** (inspired by Royal Enfield Interceptor 650) for real-time visualization.  
+- 📊 **Aircraft Performance Graphs** for comparing multiple aircraft.    
 - 📡 **FAA Aircraft Database Integration** *(in development)* – auto-fetch aircraft parameters like wing area, coefficients, and takeoff speed.  
 
 ---
@@ -30,7 +29,7 @@ A professional web application designed for pilots, flight planners, and aviatio
 
 ---
 
-## 🚀 Usage Guide
+##  Usage Guide
 
 1.enter field elevation(): example : 607
 2.enter QNH () : example : 29.42
@@ -39,18 +38,11 @@ A professional web application designed for pilots, flight planners, and aviatio
 
 
 
----
 
-##  License
-
-This project is licensed under the **MIT License**.  
-You are free to use, modify, and distribute with attribution.  
-
----
 
 ## 👨‍💻 Author
 
 **Sahil Royal**  
-📧 Contact: *(Add your email or portfolio link here)*  
+📧 Contact: *(sahilroyal1415@gmail.com)*  
 
 ---
