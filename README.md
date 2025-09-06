@@ -31,10 +31,10 @@ A professional web application designed for pilots, flight planners, and aviatio
 
 ##  Usage Guide
 
-1.enter field elevation(): example : 607
-2.enter QNH () : example : 29.42
-3.enter OAT() : example : 41
-4.enter mass() : 255000
+**1.enter field elevation(): example : 607**
+**2.enter QNH () : example : 29.42**
+**3.enter OAT() : example : 41**
+**4.enter mass() : 255000**
 
 
 
